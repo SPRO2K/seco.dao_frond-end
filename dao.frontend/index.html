@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<link rel="shortcut icon" href="https://is4-ssl.mzstatic.com/image/thumb/Purple124/v4/90/50/08/90500838-b40d-806e-e3ff-663d94ce2618/source/256x256bb.jpg" />
+		<title>Registro de personas</title>
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<!--<link rel="stylesheet" href="converter.css">
+		<link rel="stylesheet" href="fontawesome-free-6.6.0-web/css/all.css" />-->
+		<link href="css/datatables.min.css" rel="stylesheet" />
+		<link href="css/style.css" rel="stylesheet" />
+		<link href="css/dataTables.dataTables.css" rel="stylesheet" />
+		<script src="js/jquery-3.7.1.min.js"></script>
+		<script src="js/datatables.min.js"></script>
+		<script src="js/bootstrap.bundle.min.js"></script>
+		<script src="js/sweetalert2.all.min.js"></script>
+		
+	</head>
+	<body>
+		<div class="contenedor">
+			<form name="frm_persona" id="frm_persona" action="http://localhost/seco_dao_backend_pdm_2025/process.php" method="post">
+				<div class="form-group">
+					<label for="txt_nombres">Nombres:</label>
+					<input type="text" class="form-control" id="txt_nombres" name="txt_nombres" maxlength="50" style="text-transform: uppercase;" aria-describedby="nombresHelp">
+					<small id="nombresHelp" class="form-text text-muted">Digite los nombres de la persona</small>
+				</div>
+				<div class="form-group">
+					<label for="txt_apellidos">Apellidos:</label>
+					<input type="text" class="form-control" id="txt_apellidos" name="txt_apellidos" maxlength="50" style="text-transform: uppercase;" aria-describedby="apellidosHelp">
+					<small id="apellidosHelp" class="form-text text-muted">Digite los apellidos de la persona</small>
+				</div>
+				<div class="form-group">
+					<label for="txt_fnac">Fecha de nacimiento</label>
+					<input type="date" class="form-control" id="txt_fnac" name="txt_fnac" maxlength="10" aria-describedby="fnacHelp">
+					<small id="fnacHelp" class="form-text text-muted">Digite la fecha de nacimiento de la persona</small>
+				</div>
+				<div class="form-group">
+					<label for="txt_telefono">Teléfono</label>
+					<input type="text" class="form-control" id="txt_telefono" name="txt_telefono" maxlength="9" aria-describedby="telefonoHelp">
+					<small id="telefonoHelp" class="form-text text-muted">Digite un número de teléfono de la persona</small>
+				</div>
+				<div class="form-group">
+					<label for="txt_email">Email</label>
+					<input type="email" class="form-control" id="txt_email" name="txt_email" maxlength="50" aria-describedby="emailHelp">
+					<small id="emailHelp" class="form-text text-muted">Digite un email de la persona</small>
+				</div>
+				<div class="form-group">
+					<button type="button" class="btn btn-primary" id="btn_enviar" value="enviar">Enviar datos</button>
+				</div>
+			</form>
+			<hr class="mt-3 mb-3"/>
+			<table id="tabla_detalles" class="display">
+				<thead>
+					<tr>
+						<th>Id</th>
+						<th>Nombres</th>
+						<th>Apellidos</th>
+						<th>Fecha de nacimiento</th>
+						<th>Teléfono</th>
+						<th>Email</th>
+					</tr>
+				</thead>
+				<tbody>
+					
+				</tbody>
+			</table> 
+		</div>
+		<script>
+			$(document).ready(function(){
+				$("#btn_enviar").click(function(){
+					$.ajax({
+						data:{
+							n: $("#txt_nombres").val().toUpperCase(),
+							a: $("#txt_apellidos").val().toUpperCase(),
+							f: $("#txt_fnac").val(),
+							t: $("#txt_telefono").val(),
+							e: $("#txt_email").val()
+						},
+						url: $("#frm_persona").prop("action"),
+						type: 'post',
+						success: function(response){
+							console.log(response);
+							if(response.valores){
+								Swal.fire({
+									title: "¡Exito!",
+									text: "Se ha guardado la información correctamente",
+									icon:"success"
+								});
+								$("#frm_persona")[0].reset(); //SE LIMPIAN LOS CAMPOS
+								var table = $("#tabla_detalles").DataTable();
+								table.ajax.reload();
+							}else{
+								Swal.fire({
+									title: "¡UPS!",
+									text: "Lo siento, no se puede guardad los datos por la siguiente razón "+response.mensaje,
+									icon:"error"
+								});
+							}
+						},
+						error: function(xhr,textStatus,error){
+							alert(error);
+						}
+					});
+				});
+				//FIN DEL EVENTO CLIC DEL RATÓN
+
+				$("#tabla_detalles").DataTable({
+					language:{
+						url: "js/es-ES.js"
+					},
+					responsive:true,
+					ajax: "http://localhost/mejiaquintanilla_dao_backend_pdm_2025/process.php?t=selectAll",
+					collums:[
+						{data: 'id_persona'},
+						{data: 'nombres'},
+						{data: 'apellidos'},
+						{data: 'fnac'},
+						{data: 'telefono'},
+						{data: 'email'},
+					]
+				});
+			});
+			
+			//TAREA
+			// CREAR LOS ARCHIVOS manifest.json y sw.js PARA CONVERTIR ESTA APLICACIÓN EN UNA PWA (instalable)
+			//EN EL ARCHIVO sw.js agregar las siguientes rutas:
+			// ./
+			//  ./js/
+			//  ./css/
+			
+
+
+			// EN EL ARCHIVO manifest.json agregar las rutas de ./media/icons/ y ./screenshots/
+		</script>
+	</body>
+</html>
